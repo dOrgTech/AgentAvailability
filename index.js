@@ -20,7 +20,7 @@ const bot = new Bot()
 // userName: the Keybase username of the user whose availability is requested
 // utcOffset: the UTC offset to apply to the dates requested
 // Example: /avail get dorg +08:00
-// Availbilities for user dorg:
+// Availabilities for user dorg:
 // 1. 50 default
 // 2. 0 3/25/2020-3/27/2020
 // 3. 25 4/29/2021-5/1/2021
@@ -43,10 +43,10 @@ const bot = new Bot()
 //
 // /avail rm utcOffset
 // Removes an availability for the user sending the message
-// via an interative dialogue
+// via an interactive dialogue
 // utcOffset: the UTC offset to apply to the dates requested
 // Example: /avail rm
-// dorg, Which availibity would you like to remove?
+// dorg, Which availability would you like to remove?
 // 1. 50 default
 // 2. 0 3/25/2020-3/27/2020
 // 3. 25 4/29/2021-5/1/2021
