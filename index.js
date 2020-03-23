@@ -28,7 +28,8 @@ const bot = new Bot()
 //
 // /avail set workLevel
 // Sets the default availability for the user sending the message,
-// overriding the previous default value// worklevel: number 0-100, e.g. 50
+// overriding the previous default value
+// worklevel: number 0-100, e.g. 50
 // Example: /avail add 75
 // Added default availability of 50 for dorg
 //
