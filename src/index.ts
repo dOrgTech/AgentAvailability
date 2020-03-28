@@ -20,14 +20,21 @@ const configKeys = {
 const isValidDate = (date: string): boolean => {
   return true;
 }
-const isValidTimezone = (date: string): boolean => {
+const isValidTimezone = (timezone: string): boolean => {
   return true;
 }
-const isValidUsername = (date: string): boolean => {
+const isValidUsername = (username: string): boolean => {
   return true;
 }
-const isValidWorkLevel = (date: string): boolean => {
-  return true;
+const isValidWorkLevel = (worklevel: string): boolean => {
+  // TO-DO: Fix percentage validation logic
+  if (worklevel &&
+    worklevel[worklevel.length - 1] === '%') { //&&
+    //worklevel.slice(worklevel.length - 2).split('').every(char => char >= '0' && char <= '9')) { //&&
+    //Number(worklevel.slice(worklevel.length - 2)) <= 100) {
+    return true;
+  }
+  return false;
 }
 
 const writeArgsErrorMessage = (args: string[]): string => {
