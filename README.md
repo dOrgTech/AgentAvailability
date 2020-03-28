@@ -4,7 +4,7 @@ This Keybase bot is used to signal dOrg Agent availability.
 
 ## Running locally
 
-You will need to run npm install in the `src` folder to get started:
+You will need to run yarn install in the `src` folder to get started:
 
 ```bash
 yarn install
