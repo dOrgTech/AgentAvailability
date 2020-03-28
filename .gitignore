@@ -1,3 +1,15 @@
+_temp/
+.vscode
+.DS_Store
+gulp-tsc-tmp-*
+.gulp-tsc-tmp-*
+output/
+*.js
+*.js.map
+*.d.ts
+config.json
+!gulpfile.js
+
 # Logs
 logs
 *.log

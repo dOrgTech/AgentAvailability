@@ -6,7 +6,10 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "keybase-bot": "^3.6.1",
-    "mathjs": "^6.6.1"
+    "@types/mathjs": "^6.0.4",
+    "keybase-bot": "^3.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^13.9.5"
   }
 }

@@ -1,15 +1,8 @@
 #!/usr/bin/env node
-const Bot = require('keybase-bot')
-const mathjs = require('mathjs')
+import Bot from 'keybase-bot'
 
-//
 // This bot replies to any message from any user,
-// starting with `/math` (in any channel)
-// by actually trying to do the math. For example
-// send it :
-//
-//          /math sqrt(pi/2) * 3!`
-//
+// starting with `/avail` (in any channel)
 
 const bot = new Bot()
 
@@ -54,43 +47,32 @@ const bot = new Bot()
 // 4. 75 5/2/2021-5/10/2021
 //
 
-const msgReply = s => {
-  let a1, a2, ans, b1, b2, eqn
-  try {
-    ans = '= ' + mathjs['eval'](s).toString()
-  } catch (e) {
-    a1 = Math.floor(Math.random() * 10)
-    b1 = Math.floor(Math.random() * 10)
-    a2 = Math.floor(Math.random() * 10)
-    b2 = Math.floor(Math.random() * 10)
-    eqn = '(' + a1 + ' + ' + b1 + 'i) * (' + a2 + ' + ' + b2 + 'i)'
-    ans = "Sorry, I can't do that math. Did you know " + eqn + ' = ' + mathjs['eval'](eqn).toString() + '? True.'
-  }
-  return ans
+const msgReply = (s: any) => {
+  return "Hello, there";
 }
 
 function main() {
   const username = process.env.KB_USERNAME
   const paperkey = process.env.KB_PAPERKEY
   bot
-    .init(username, paperkey)
+    .init(username || '', paperkey || '')
     .then(() => {
-      console.log('I am me!', bot.myInfo().username, bot.myInfo().devicename)
+      console.log('I am me!', bot.myInfo()?.username, bot.myInfo()?.devicename)
       console.log('Beginning watch for new messages.')
-      console.log(`Tell anyone to send a message to ${bot.myInfo().username} starting with '/math '`)
-      const onMessage = message => {
+      console.log(`Tell anyone to send a message to ${bot.myInfo()?.username} starting with '/avail '`)
+      const onMessage = (message:any) => {
         if (message.content.type === 'text') {
-          const prefix = message.content.text.body.slice(0, 6)
-          if (prefix === '/math ') {
+          const prefix = message.content.text.body.slice(0, 7)
+          if (prefix === '/avail ') {
             const reply = {body: msgReply(message.content.text.body.slice(6))}
             bot.chat.send(message.conversationId, reply)
           }
         }
       }
-      const onError = e => console.error(e)
+      const onError = (e:any) => console.error(e)
       bot.chat.watchAllChannelsForNewMessages(onMessage, onError)
     })
-    .catch(error => {
+    .catch((error:any) => {
       console.error(error)
       shutDown()
     })
