@@ -7,7 +7,7 @@ This Keybase bot is used to signal dOrg Agent availability.
 You will need to run npm install in the `src` folder to get started:
 
 ```bash
-npm install
+yarn install
 ```
 
 ## Debugging locally
@@ -25,7 +25,7 @@ Set up these two files in a `.vscode` folder at the root of the Git repository t
         {
             "env": {
                 "KB_USERNAME": "keybase_username",
-                "KB_PAPERKEY": "keybase_ paperkey"
+                "KB_PAPERKEY": "keybase_paperkey"
             },
             "name": "Launch Program",
             "outFiles": [
