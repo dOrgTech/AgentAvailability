@@ -5,6 +5,17 @@ This Keybase bot is used to signal dOrg Agent availability.
 ## Example usage
 
 ```
+User: /avail get
+Bot: Availability for user usera:
+Default: 50%
+Time Zone: EST (-05:00)
+- [3/25/2020 - 3/27/2020] 0%
+- [3/28/2020 - 4/28/2020] 50%
+- [4/29/2020 - 5/01/2020] 25%
+- [5/02/2020 - 5/10/2020] 75%
+```
+
+```
 User: /avail get usera
 Bot: usera has not set their availability
 ```
@@ -29,23 +40,36 @@ Time Zone: CET (+01:00)
 Uses specified time zone "CET" instead of userb's time zone of "EST"
 
 ```
-User: /avail config set default 80%
+User: /avail set default 80%
 Bot: Your default availability has been set to 80%
 ```
 
 ```
 User: /avail add 0% 7/10/2020 7/30/2020
-Bot: Please set your time-zone first
+Bot: Please set your time zone first
 ```
 
 ```
-User: /avail config set time-zone CET
-Bot: Your time-zone has been updated to CET (+01:00)
+User: /avail set timezone CET
+Bot: Your time zone has been updated to CET (+01:00)
 ```
 
 ```
 User: /avail add 0% 7/10/2020 7/30/2020
 Bot: Added availability of 0% for 7/10/2020 7/30/2020 CET (+01:00)
+```
+
+```
+User: /avail rm
+Bot: Which availability would you like to remove?
+Default: 50%
+Time Zone: EST (-05:00)
+1. [3/25/2020 - 3/27/2020] 0%
+2. [3/28/2020 - 4/28/2020] 50%
+3. [4/29/2020 - 5/01/2020] 25%
+4. [5/02/2020 - 5/10/2020] 75%
+User: 1
+Bot: Removed availability of 0% for 3/25/2020 3/27/2020 EST (-05:00)
 ```
 
 ## Running locally
