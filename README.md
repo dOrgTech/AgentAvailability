@@ -68,7 +68,8 @@ Time Zone: EST (-05:00)
 2. [3/28/2020 - 4/28/2020] 50%
 3. [4/29/2020 - 5/01/2020] 25%
 4. [5/02/2020 - 5/10/2020] 75%
-User: 1
+Respond with /avail rm #
+User: /avail rm 1
 Bot: Removed availability of 0% for 3/25/2020 3/27/2020 EST (-05:00)
 ```
 

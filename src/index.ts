@@ -2,50 +2,120 @@
 import Bot from 'keybase-bot'
 import { MsgSummary } from 'keybase-bot/lib/types/chat1'
 
-const bot = new Bot()
-const commandPrefix:string = '/avail '
+// TO-DO: Implement storage
+const bot = new Bot();
+const commandPrefix:string = '/avail ';
 const commandVerbs = {
   addVerb: 'add',
   getVerb: 'get',
   setVerb: 'set',
   rmVerb: 'rm',
+};
+const configKeys = {
+  default: 'default',
+  timezone: 'timezone'
+};
+
+// TO-DO: Add validation that timezone has been set before adding
+// TO-DO: Add validation of arguments
+const addValue = (args:string[], username:string) => {
+  if (args[0] && args[1]) {
+    if (args[3]) {
+      return `Added availability of ${args[0]} for ${args[1]} ${args[2]} timezone`;
+    }
+    else {
+      return `Added availability of ${args[0]} for ${args[1]} ${args[1]} timezone`;
+    }
+  }
+  else {
+    let errorMessage:string = `Invalid arguments: ${args.toString()}`;
+    console.error(errorMessage); 
+    return errorMessage;
+  }
 }
 
-const addValue = (args:string[]) => {
-  return 'Added availability of 0% for 7/10/2020 7/30/2020 CET (+01:00)';
+// TO-DO: Add validation of username at args[0]
+const getValues = (args:string[], username:string) => {
+  if (!args[0]) {
+    return `Availability for user ${username}:
+      Default: 50%
+      Time Zone: EST (-05:00)
+      - [3/25/2020 - 3/27/2020] 0%
+      - [3/28/2020 - 4/28/2020] 50%
+      - [4/29/2020 - 5/01/2020] 25%
+      - [5/02/2020 - 5/10/2020] 75%`;
+  }
+  else if (args[0] && args[0] !== '') {
+    return `Availability for user ${args[0]}:
+      Default: 50%
+      Time Zone: EST (-05:00)
+      - [3/25/2020 - 3/27/2020] 0%
+      - [3/28/2020 - 4/28/2020] 50%
+      - [4/29/2020 - 5/01/2020] 25%
+      - [5/02/2020 - 5/10/2020] 75%`;
+  }
+  else {
+    let errorMessage:string = `Invalid arguments: ${args.toString()}`;
+    console.error(errorMessage); 
+    return errorMessage;
+  }
 }
 
-const getValues = (args:string[]) => {
-  return `Availability for user ...:
-  Default: 50%
-  Time Zone: EST (-05:00)
-  - [3/25/2020 - 3/27/2020] 0%
-  - [3/28/2020 - 4/28/2020] 50%
-  - [4/29/2020 - 5/01/2020] 25%
-  - [5/02/2020 - 5/10/2020] 75%`;
+// TO-DO: Validate work level at args[1]
+// TO-DO: Validate timezone at args[1]
+const setValue = (args:string[], username:string)  => {
+  if (args[0] === configKeys.default) {
+    return `Your default availability has been set to ${args[1]}`;
+  }
+  else if(args[0] === configKeys.timezone) {
+    return `Your time zone has been updated to ${args[1]}`;
+  }
+  else {
+    let errorMessage:string = `Invalid arguments: ${args.toString()}`;
+    console.error(errorMessage); 
+    return errorMessage;
+  }
 }
 
-const setValue = (args:string[]) => {
-  return 'setValue';
-}
-
-const rmValue = (args:string[]) => {
-  return 'rmValue';
+// TO-DO: Verify args[0] is a key of an availability
+const rmValue = (args:string[], username:string)  => {
+  if (args.length === 0) {
+    return `Which availability would you like to remove?
+      Default: 50%
+      Time Zone: EST (-05:00)
+      1. [3/25/2020 - 3/27/2020] 0%
+      2. [3/28/2020 - 4/28/2020] 50%
+      3. [4/29/2020 - 5/01/2020] 25%
+      4. [5/02/2020 - 5/10/2020] 75%
+      Respond with /avail rm #`;
+  }
+  else if (args[0] && !isNaN(Number(args[0]))) {
+    return 'Removed availability of 0% for 3/25/2020 3/27/2020 EST (-05:00)'
+  }
+  else {
+    let errorMessage:string = `Invalid arguments: ${args.toString()}`;
+    console.error(errorMessage); 
+    return errorMessage;
+  }
 }
 
 const msgReply = (message: MsgSummary) => {
   let args:string[] = message?.content?.text?.body.split(" ") || [];
   if (args[1] === commandVerbs.addVerb) {
-    return addValue(args.splice(0, 2));
+    args.splice(0, 2);
+    return addValue(args, message?.sender?.username || '');
   }
   else if (args[1] === commandVerbs.getVerb) {
-    return getValues(args.splice(0, 2));
+    args.splice(0, 2);
+    return getValues(args, message?.sender?.username || '');
   }
   else if(args[1] === commandVerbs.setVerb) {
-    return setValue(args.splice(0, 2));
+    args.splice(0, 2);
+    return setValue(args, message?.sender?.username || '');
   }
   else if(args[1] === commandVerbs.rmVerb) {
-    return rmValue(args.splice(0, 2));
+    args.splice(0, 2);
+    return rmValue(args, message?.sender?.username || '');
   }
   else {
     let errorMessage:string = `Invalid command verb: ${args[2]}`;
