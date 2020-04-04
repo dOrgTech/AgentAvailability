@@ -2,7 +2,6 @@
 import Bot from 'keybase-bot'
 import { MsgSummary } from 'keybase-bot/lib/types/chat1'
 
-// TO-DO: Implement storage and CRUD operations in functions
 const bot = new Bot();
 const commandPrefix: string = '/avail ';
 const commandVerbs = {
@@ -15,6 +14,12 @@ const configKeys = {
   default: 'default',
   timezone: 'timezone'
 };
+const nameSpaces = {
+  availabilities: 'AgentAvailability.Availabilities',
+  defaultWorkLevels: 'AgentAvailability.DefaultWorkLevels',
+  timezones: 'AgentAvailability.TimeZones',
+}
+const teamName = 'test040420';
 
 // TO-DO: Implement validation
 const isValidDate = (date: string): boolean => {
@@ -43,18 +48,32 @@ const writeArgsErrorMessage = (args: string[]): string => {
   return errorMessage;
 }
 
-// TO-DO: Add validation that timezone has been set before adding
-const addValue = (args: string[], username: string): string => {
+const timezoneNotSetErrormessage = (username: string): string => {
+  let errorMessage: string = `Timezone has not been set for user ${username}`;
+  console.error(errorMessage);
+  return errorMessage;
+}
+
+// TO-DO: Add support for multiple availabilities
+// TO-DO: Add conversion of dates to user's timezone
+async function addValue (args: string[], username: string): Promise<string> {
+  let timezone = (await bot.kvstore.get(teamName, nameSpaces.timezones, username)).entryValue
+  if (timezone === '') {
+    return timezoneNotSetErrormessage(username);
+  }
+
   if (isValidWorkLevel(args[0]) &&
     isValidDate(args[1])) {
     if (isValidDate(args[2])) {
-      return `Added availability of ${args[0]} for ${args[1]} ${args[2]} timezone`;
+      await bot.kvstore.put(teamName, nameSpaces.availabilities, username, `${args[0]} ${args[1]} ${args[2]}`);
+      return `Added availability of ${args[0]} for ${args[1]} ${args[2]} ${timezone}`;
     }
     else if (!isValidDate(args[2])) {
       return writeArgsErrorMessage(args);
     }
     else {
-      return `Added availability of ${args[0]} for ${args[1]} ${args[1]} timezone`;
+      await bot.kvstore.put(teamName, nameSpaces.availabilities, username, `${args[0]} ${args[1]} ${args[1]}`);
+      return `Added availability of ${args[0]} for ${args[1]} ${args[1]} ${timezone}`;
     }
   }
   else {
@@ -63,37 +82,58 @@ const addValue = (args: string[], username: string): string => {
 }
 
 // TO-DO: Add validation of username at args[0]
-const getValues = (args: string[], username: string) => {
+// TO-DO: Add support for multiple availabilities
+// TO-DO: Add conversion of dates to user's timezone
+// TO-DO: Add conversion of dates to a specified timezone
+async function getValues (args: string[], username: string) : Promise<string> {
   if (!args[0]) {
+    let availability = (await bot.kvstore.get(teamName, nameSpaces.availabilities, username)).entryValue;
+    let defaultWorkLevel = (await bot.kvstore.get(teamName, nameSpaces.defaultWorkLevels, username)).entryValue;
+    let timezone = (await bot.kvstore.get(teamName, nameSpaces.timezones, username)).entryValue;
+    if (timezone === '') {
+      return timezoneNotSetErrormessage(username);
+    }
+    if (availability === '') {
+      return `No availabilities set for user ${username}:
+        Default: ${defaultWorkLevel}
+        Time Zone: ${timezone}`
+    }
     return `Availability for user ${username}:
-      Default: 50%
-      Time Zone: EST (-05:00)
-      - [3/25/2020 - 3/27/2020] 0%
-      - [3/28/2020 - 4/28/2020] 50%
-      - [4/29/2020 - 5/01/2020] 25%
-      - [5/02/2020 - 5/10/2020] 75%`;
+      Default: ${defaultWorkLevel}
+      Time Zone: ${timezone}
+      - ${availability}`;
   }
   else if (isValidUsername(args[0])) {
+    let availability = (await bot.kvstore.get(teamName, nameSpaces.availabilities, args[0])).entryValue;
+    let defaultWorkLevel = (await bot.kvstore.get(teamName, nameSpaces.defaultWorkLevels, args[0])).entryValue;
+    let timezone = (await bot.kvstore.get(teamName, nameSpaces.timezones, args[0])).entryValue;
+    if (timezone === '') {
+      return timezoneNotSetErrormessage(args[0]);
+    }
+    if (availability === '') {
+      return `No availabilities set for user ${args[0]}:
+      Default: ${defaultWorkLevel}
+      Time Zone: ${timezone}`
+    }
     return `Availability for user ${args[0]}:
-      Default: 50%
-      Time Zone: EST (-05:00)
-      - [3/25/2020 - 3/27/2020] 0%
-      - [3/28/2020 - 4/28/2020] 50%
-      - [4/29/2020 - 5/01/2020] 25%
-      - [5/02/2020 - 5/10/2020] 75%`;
+      Default: ${defaultWorkLevel}
+      Time Zone: ${timezone}
+      - ${availability}`;
   }
   else {
     return writeArgsErrorMessage(args);
   }
 }
 
-const setValue = (args: string[], username: string) => {
+async function setValue (args: string[], username: string): Promise<string> {
   if (args[0] === configKeys.default &&
     isValidWorkLevel(args[1])) {
+    await bot.kvstore.put(teamName, nameSpaces.defaultWorkLevels, username, args[1]);
     return `Your default availability has been set to ${args[1]}`;
   }
   else if (args[0] === configKeys.timezone &&
     isValidTimezone(args[1])) {
+    await bot.kvstore.put(teamName, nameSpaces.timezones, username, args[1]);
     return `Your time zone has been updated to ${args[1]}`;
   }
   else {
@@ -101,27 +141,34 @@ const setValue = (args: string[], username: string) => {
   }
 }
 
-// TO-DO: Verify args[0] is a key of an availability
-const rmValue = (args: string[], username: string) => {
+// TO-DO: Add support for multiple availabilities
+// TO-DO: Add conversion of dates to user's timezone
+async function rmValue (args: string[], username: string): Promise<string> {
+  let timezone = (await bot.kvstore.get(teamName, nameSpaces.timezones, username)).entryValue;
+  if (timezone === '') {
+    return timezoneNotSetErrormessage(username);
+  }
+
   if (args.length === 0) {
+    let availability = (await bot.kvstore.get(teamName, nameSpaces.availabilities, username)).entryValue;
+    let defaultWorkLevel = (await bot.kvstore.get(teamName, nameSpaces.defaultWorkLevels, username)).entryValue;
     return `Which availability would you like to remove?
-      Default: 50%
-      Time Zone: EST (-05:00)
-      1. [3/25/2020 - 3/27/2020] 0%
-      2. [3/28/2020 - 4/28/2020] 50%
-      3. [4/29/2020 - 5/01/2020] 25%
-      4. [5/02/2020 - 5/10/2020] 75%
+      Default: ${defaultWorkLevel}
+      Time Zone: ${timezone}
+      1. ${availability}
       Respond with /avail rm #`;
   }
   else if (args[0] && !isNaN(Number(args[0]))) {
-    return 'Removed availability of 0% for 3/25/2020 3/27/2020 EST (-05:00)'
+    // TO-DO: Verify args[0] is a key of an availability
+    await bot.kvstore.delete(teamName, nameSpaces.availabilities, username);
+    return `Removed availability of 0% for 3/25/2020 3/27/2020 ${timezone}`;
   }
   else {
     return writeArgsErrorMessage(args);
   }
 }
 
-const msgReply = (message: MsgSummary): string => {
+async function msgReply (message: MsgSummary) : Promise<string> {
   let args: string[] = message?.content?.text?.body.split(" ") || [];
   if (args[1] === commandVerbs.addVerb) {
     args.splice(0, 2);
@@ -146,7 +193,7 @@ const msgReply = (message: MsgSummary): string => {
   }
 }
 
-function main() {
+async function main() {
   const username = process.env.KB_USERNAME;
   const paperkey = process.env.KB_PAPERKEY;
   bot
@@ -154,11 +201,11 @@ function main() {
     .then(() => {
       console.log('Starting up', bot.myInfo()?.username, bot.myInfo()?.devicename);
       console.log(`Watching for new messages to ${bot.myInfo()?.username} starting with ${commandPrefix}`);
-      const onMessage = (message: MsgSummary) => {
+      async function onMessage (message: MsgSummary): Promise<void> {
         if (message?.content.type === 'text') {
           const prefix = message?.content?.text?.body.slice(0, commandPrefix.length);
           if (prefix === commandPrefix) {
-            const reply = { body: msgReply(message) };
+            const reply = { body: await msgReply(message) };
             bot.chat.send(message.conversationId, reply);
           }
         }
@@ -179,4 +226,11 @@ function shutDown() {
 process.on('SIGINT', shutDown);
 process.on('SIGTERM', shutDown);
 
-main();
+(async () => {
+  try {
+      var text = await main();
+      console.log(text);
+  } catch (e) {
+    console.log(e)
+  }
+})();
