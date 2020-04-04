@@ -19,16 +19,26 @@ const nameSpaces = {
   defaultWorkLevels: 'AgentAvailability.DefaultWorkLevels',
   timezones: 'AgentAvailability.TimeZones',
 }
-const teamName = 'test040420';
+const paperkey = process.env.KB_PAPERKEY;
+const teamName = process.env.KB_TEAMNAME;
+const username = process.env.KB_USERNAME;
 
-// TO-DO: Return formatted string
-const getAvailabilitiesString = (availabilities: object[]): string => {
-  return JSON.stringify(availabilities);
+type Availability = {
+  startDate: string,
+  endDate: string,
+  workLevel: string
 }
 
-// TO-DO: Return formatted string
-const getAvailabilityString = (availability: object): string => {
-  return JSON.stringify(availability);
+const getAvailabilitiesString = (availabilities: Availability[]): string => {
+  let availabilitiesString = '';
+  availabilities.forEach((item, index) => {
+    availabilitiesString += `\r\n${index+1}. [${item.startDate} - ${item.endDate}] ${item.workLevel}`;
+  });
+  return availabilitiesString;
+}
+
+const getAvailabilityString = (availability: Availability): string => {
+  return `[${availability.startDate} - ${availability.endDate}] ${availability.workLevel}`;
 }
 
 // TO-DO: Implement validation
@@ -66,7 +76,7 @@ const timezoneNotSetErrormessage = (username: string): string => {
 
 // TO-DO: Add conversion of dates to user's timezone
 async function addValue(args: string[], username: string): Promise<string> {
-  let newAvailability = {
+  let newAvailability: Availability = {
     startDate: '',
     endDate: '',
     workLevel: ''
@@ -123,16 +133,17 @@ async function getValues(args: string[], username: string): Promise<string> {
     return timezoneNotSetErrormessage(username);
   }
   if (availabilitiesString === '') {
-    return `No availabilities set for user ${username}:
-        Default: ${defaultWorkLevel}
-        Time Zone: ${timezone}`
+    return `${username} has not set their availability`
   }
 
-  let availabilities: object[] = JSON.parse(availabilitiesString);
+  let availabilities: Availability[] = JSON.parse(availabilitiesString);
+
+  if (availabilities.length === 0) {
+    return `${username} has not set their availability`
+  }
   return `Availability for user ${username}:
       Default: ${defaultWorkLevel}
-      Time Zone: ${timezone}
-      ${getAvailabilitiesString(availabilities)}`;
+      Time Zone: ${timezone} ${getAvailabilitiesString(availabilities)}`;
 
 }
 
@@ -161,15 +172,21 @@ async function rmValue(args: string[], username: string): Promise<string> {
 
   if (args.length === 0) {
     let availabilitiesString = (await bot.kvstore.get(teamName, nameSpaces.availabilities, username)).entryValue;
-    let availabilities: object[] = [];
+    let availabilities: Availability[] = [];
     if (availabilitiesString !== '') {
       availabilities = JSON.parse(availabilitiesString);
     }
+    else {
+      return `${username} has not set their availability`
+    }
+    if (availabilities.length === 0) {
+      return `${username} has not set their availability`
+    }
+    
     let defaultWorkLevel = (await bot.kvstore.get(teamName, nameSpaces.defaultWorkLevels, username)).entryValue;
     return `Which availability would you like to remove?
       Default: ${defaultWorkLevel}
-      Time Zone: ${timezone}
-      ${getAvailabilitiesString(availabilities)}
+      Time Zone: ${timezone} ${getAvailabilitiesString(availabilities)}
       Respond with /avail rm #`;
   }
   else if (args[0] && !isNaN(Number(args[0]))) {
@@ -179,8 +196,8 @@ async function rmValue(args: string[], username: string): Promise<string> {
       availabilities = JSON.parse(availabilitiesString);
     }
 
-    if (availabilities[Number(args[0])]) {
-      availabilities.splice(Number(args[0]), 1);
+    if (availabilities[Number(args[0])-1]) {
+      availabilities.splice(Number(args[0])-1, 1);
     }
     else {
       return writeArgsErrorMessage(args);
@@ -220,8 +237,6 @@ async function msgReply(message: MsgSummary): Promise<string> {
 }
 
 async function main() {
-  const username = process.env.KB_USERNAME;
-  const paperkey = process.env.KB_PAPERKEY;
   bot
     .init(username || '', paperkey || '')
     .then(() => {

@@ -96,7 +96,8 @@ Set up these two files in a `.vscode` folder at the root of the Git repository t
         {
             "env": {
                 "KB_USERNAME": "keybase_username",
-                "KB_PAPERKEY": "keybase_paperkey"
+                "KB_PAPERKEY": "keybase_paperkey",
+                "KB_TEAMNAME": "keybase_teamname"
             },
             "name": "Launch Program",
             "outFiles": [
