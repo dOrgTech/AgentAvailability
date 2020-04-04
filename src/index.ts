@@ -21,6 +21,16 @@ const nameSpaces = {
 }
 const teamName = 'test040420';
 
+// TO-DO: Return formatted string
+const getAvailabilitiesString = (availabilities: object[]): string => {
+  return JSON.stringify(availabilities);
+}
+
+// TO-DO: Return formatted string
+const getAvailabilityString = (availability: object): string => {
+  return JSON.stringify(availability);
+}
+
 // TO-DO: Implement validation
 const isValidDate = (date: string): boolean => {
   return true;
@@ -54,78 +64,79 @@ const timezoneNotSetErrormessage = (username: string): string => {
   return errorMessage;
 }
 
-// TO-DO: Add support for multiple availabilities
 // TO-DO: Add conversion of dates to user's timezone
-async function addValue (args: string[], username: string): Promise<string> {
+async function addValue(args: string[], username: string): Promise<string> {
+  let newAvailability = {
+    startDate: '',
+    endDate: '',
+    workLevel: ''
+  }
   let timezone = (await bot.kvstore.get(teamName, nameSpaces.timezones, username)).entryValue
   if (timezone === '') {
     return timezoneNotSetErrormessage(username);
   }
 
-  if (isValidWorkLevel(args[0]) &&
-    isValidDate(args[1])) {
-    if (isValidDate(args[2])) {
-      await bot.kvstore.put(teamName, nameSpaces.availabilities, username, `${args[0]} ${args[1]} ${args[2]}`);
-      return `Added availability of ${args[0]} for ${args[1]} ${args[2]} ${timezone}`;
-    }
-    else if (!isValidDate(args[2])) {
-      return writeArgsErrorMessage(args);
-    }
-    else {
-      await bot.kvstore.put(teamName, nameSpaces.availabilities, username, `${args[0]} ${args[1]} ${args[1]}`);
-      return `Added availability of ${args[0]} for ${args[1]} ${args[1]} ${timezone}`;
-    }
-  }
-  else {
+  if (!isValidWorkLevel(args[0]) &&
+    !isValidDate(args[1])) {
     return writeArgsErrorMessage(args);
   }
+  if (args[2] &&
+    !isValidDate(args[2])) {
+    return writeArgsErrorMessage(args);
+  }
+
+  newAvailability.workLevel = args[0];
+  newAvailability.startDate = args[1];
+  if (!args[2]) {
+    newAvailability.endDate = args[1];
+  }
+  else {
+    newAvailability.endDate = args[2];
+  }
+
+  let availabilitiesString = (await bot.kvstore.get(teamName, nameSpaces.availabilities, username)).entryValue;
+  let availabilities: object[] = [];
+  if (availabilitiesString !== '') {
+    availabilities = JSON.parse(availabilitiesString);
+  }
+  availabilities.push(newAvailability);
+  await bot.kvstore.put(teamName, nameSpaces.availabilities, username, JSON.stringify(availabilities));
+  return `Added availability of ${getAvailabilityString(newAvailability)} ${timezone}`;
 }
 
-// TO-DO: Add validation of username at args[0]
-// TO-DO: Add support for multiple availabilities
 // TO-DO: Add conversion of dates to user's timezone
 // TO-DO: Add conversion of dates to a specified timezone
-async function getValues (args: string[], username: string) : Promise<string> {
-  if (!args[0]) {
-    let availability = (await bot.kvstore.get(teamName, nameSpaces.availabilities, username)).entryValue;
-    let defaultWorkLevel = (await bot.kvstore.get(teamName, nameSpaces.defaultWorkLevels, username)).entryValue;
-    let timezone = (await bot.kvstore.get(teamName, nameSpaces.timezones, username)).entryValue;
-    if (timezone === '') {
-      return timezoneNotSetErrormessage(username);
+async function getValues(args: string[], username: string): Promise<string> {
+  if (args[0]) {
+    if (isValidUsername(args[0])) {
+      username = args[0]
     }
-    if (availability === '') {
-      return `No availabilities set for user ${username}:
+    else {
+      return writeArgsErrorMessage(args);
+    }
+  }
+
+  let availabilitiesString = (await bot.kvstore.get(teamName, nameSpaces.availabilities, username)).entryValue;
+  let defaultWorkLevel = (await bot.kvstore.get(teamName, nameSpaces.defaultWorkLevels, username)).entryValue;
+  let timezone = (await bot.kvstore.get(teamName, nameSpaces.timezones, username)).entryValue;
+  if (timezone === '') {
+    return timezoneNotSetErrormessage(username);
+  }
+  if (availabilitiesString === '') {
+    return `No availabilities set for user ${username}:
         Default: ${defaultWorkLevel}
         Time Zone: ${timezone}`
-    }
-    return `Availability for user ${username}:
+  }
+
+  let availabilities: object[] = JSON.parse(availabilitiesString);
+  return `Availability for user ${username}:
       Default: ${defaultWorkLevel}
       Time Zone: ${timezone}
-      - ${availability}`;
-  }
-  else if (isValidUsername(args[0])) {
-    let availability = (await bot.kvstore.get(teamName, nameSpaces.availabilities, args[0])).entryValue;
-    let defaultWorkLevel = (await bot.kvstore.get(teamName, nameSpaces.defaultWorkLevels, args[0])).entryValue;
-    let timezone = (await bot.kvstore.get(teamName, nameSpaces.timezones, args[0])).entryValue;
-    if (timezone === '') {
-      return timezoneNotSetErrormessage(args[0]);
-    }
-    if (availability === '') {
-      return `No availabilities set for user ${args[0]}:
-      Default: ${defaultWorkLevel}
-      Time Zone: ${timezone}`
-    }
-    return `Availability for user ${args[0]}:
-      Default: ${defaultWorkLevel}
-      Time Zone: ${timezone}
-      - ${availability}`;
-  }
-  else {
-    return writeArgsErrorMessage(args);
-  }
+      ${getAvailabilitiesString(availabilities)}`;
+
 }
 
-async function setValue (args: string[], username: string): Promise<string> {
+async function setValue(args: string[], username: string): Promise<string> {
   if (args[0] === configKeys.default &&
     isValidWorkLevel(args[1])) {
     await bot.kvstore.put(teamName, nameSpaces.defaultWorkLevels, username, args[1]);
@@ -141,26 +152,41 @@ async function setValue (args: string[], username: string): Promise<string> {
   }
 }
 
-// TO-DO: Add support for multiple availabilities
 // TO-DO: Add conversion of dates to user's timezone
-async function rmValue (args: string[], username: string): Promise<string> {
+async function rmValue(args: string[], username: string): Promise<string> {
   let timezone = (await bot.kvstore.get(teamName, nameSpaces.timezones, username)).entryValue;
   if (timezone === '') {
     return timezoneNotSetErrormessage(username);
   }
 
   if (args.length === 0) {
-    let availability = (await bot.kvstore.get(teamName, nameSpaces.availabilities, username)).entryValue;
+    let availabilitiesString = (await bot.kvstore.get(teamName, nameSpaces.availabilities, username)).entryValue;
+    let availabilities: object[] = [];
+    if (availabilitiesString !== '') {
+      availabilities = JSON.parse(availabilitiesString);
+    }
     let defaultWorkLevel = (await bot.kvstore.get(teamName, nameSpaces.defaultWorkLevels, username)).entryValue;
     return `Which availability would you like to remove?
       Default: ${defaultWorkLevel}
       Time Zone: ${timezone}
-      1. ${availability}
+      ${getAvailabilitiesString(availabilities)}
       Respond with /avail rm #`;
   }
   else if (args[0] && !isNaN(Number(args[0]))) {
-    // TO-DO: Verify args[0] is a key of an availability
-    await bot.kvstore.delete(teamName, nameSpaces.availabilities, username);
+    let availabilitiesString = (await bot.kvstore.get(teamName, nameSpaces.availabilities, username)).entryValue;
+    let availabilities: object[] = [];
+    if (availabilitiesString !== '') {
+      availabilities = JSON.parse(availabilitiesString);
+    }
+
+    if (availabilities[Number(args[0])]) {
+      availabilities.splice(Number(args[0]), 1);
+    }
+    else {
+      return writeArgsErrorMessage(args);
+    }
+
+    await bot.kvstore.put(teamName, nameSpaces.availabilities, username, JSON.stringify(availabilities));
     return `Removed availability of 0% for 3/25/2020 3/27/2020 ${timezone}`;
   }
   else {
@@ -168,7 +194,7 @@ async function rmValue (args: string[], username: string): Promise<string> {
   }
 }
 
-async function msgReply (message: MsgSummary) : Promise<string> {
+async function msgReply(message: MsgSummary): Promise<string> {
   let args: string[] = message?.content?.text?.body.split(" ") || [];
   if (args[1] === commandVerbs.addVerb) {
     args.splice(0, 2);
@@ -201,7 +227,7 @@ async function main() {
     .then(() => {
       console.log('Starting up', bot.myInfo()?.username, bot.myInfo()?.devicename);
       console.log(`Watching for new messages to ${bot.myInfo()?.username} starting with ${commandPrefix}`);
-      async function onMessage (message: MsgSummary): Promise<void> {
+      async function onMessage(message: MsgSummary): Promise<void> {
         if (message?.content.type === 'text') {
           const prefix = message?.content?.text?.body.slice(0, commandPrefix.length);
           if (prefix === commandPrefix) {
@@ -228,8 +254,8 @@ process.on('SIGTERM', shutDown);
 
 (async () => {
   try {
-      var text = await main();
-      console.log(text);
+    var text = await main();
+    console.log(text);
   } catch (e) {
     console.log(e)
   }
