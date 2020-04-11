@@ -34,18 +34,6 @@ Time Zone: America/New_York
 ```
 
 ```
-User: /avail get userb America/Los_Angeles
-Bot: Availability for user userb:
-Default: 50%
-Time Zone: America/Los_Angeles
-- [3/25/2020 - 3/27/2020] 0%
-- [3/28/2020 - 4/28/2020] 50%
-- [4/29/2020 - 5/01/2020] 25%
-- [5/02/2020 - 5/10/2020] 75%
-```
-Uses specified time zone "America/Los_Angeles" instead of userb's time zone of "America/New_York"
-
-```
 User: /avail set default 80%
 Bot: Your default availability has been set to 80%
 ```
@@ -80,10 +68,24 @@ Bot: Removed availability of 0% for 3/25/2020 3/27/2020 America/New_York
 ```
 
 ## Development tasks to do
+* Fix bug where dates are adjusted improperly:
+local->UTC->local isn't working properly
 * Add better validation fail messages
-* Add logging
+* Add logging & better error handling
 * Refactor
 * Deploy
+* Add conversion to a specified time zone, example:
+```
+User: /avail get userb America/Los_Angeles
+Bot: Availability for user userb:
+Default: 50%
+Time Zone: America/Los_Angeles
+- [3/25/2020 - 3/27/2020] 0%
+- [3/28/2020 - 4/28/2020] 50%
+- [4/29/2020 - 5/01/2020] 25%
+- [5/02/2020 - 5/10/2020] 75%
+```
+Uses specified time zone "America/Los_Angeles" instead of userb's time zone of "America/New_York"
 * (Optional) Add a help verb to display docs for different commands, example: 
 ```
 User: /avail help

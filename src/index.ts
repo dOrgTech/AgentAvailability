@@ -16,6 +16,7 @@ const configKeys = {
   default: 'default',
   timezone: 'timezone'
 };
+const dateFormat = 'M/D/YYYY';
 const momentTimezoneNames = momentTimezone.tz.names();
 const nameSpaces = {
   availabilities: 'AgentAvailability.Availabilities',
@@ -34,20 +35,27 @@ type Availability = {
   workLevel: string
 }
 
-const getAvailabilitiesString = (availabilities: Availability[]): string => {
+const getAvailabilitiesString = (availabilities: Availability[], timezone: string): string => {
   let availabilitiesString = '';
   availabilities.forEach((item, index) => {
-    availabilitiesString += `\r\n${index + 1}. [${item.startDate} - ${item.endDate}] ${item.workLevel}`;
+    let availability: Availability = {
+      startDate: item.startDate,
+      endDate: item.endDate,
+      workLevel: item.workLevel
+    }
+    availabilitiesString += `\r\n${index + 1}. ${getAvailabilityString(availability, timezone)}`;
   });
   return availabilitiesString;
 }
 
-const getAvailabilityString = (availability: Availability): string => {
-  return `[${availability.startDate} - ${availability.endDate}] ${availability.workLevel}`;
+const getAvailabilityString = (availability: Availability, timezone: string): string => {
+  let startDate = momentTimezone.utc(availability.startDate, dateFormat).tz(timezone).format(dateFormat);
+  let endDate = momentTimezone.utc(availability.endDate, dateFormat).tz(timezone).format(dateFormat);
+  return `[${startDate} - ${endDate}] ${availability.workLevel}`;
 }
 
 const isValidDate = (date: string): boolean => {
-  let validatedDate: Moment = moment(date, 'M/DD/YYYY', true);
+  let validatedDate: Moment = moment(date, dateFormat, true);
   if (validatedDate.isValid()) {
     return true;
   }
@@ -84,8 +92,6 @@ const timezoneNotSetErrormessage = (username: string): string => {
   return errorMessage;
 }
 
-// TO-DO: Add conversion of dates to user's timezone
-// TO-DO: Add conversion of dates to UTC timezone
 async function addValue(args: string[], username: string): Promise<string> {
   let newAvailability: Availability = {
     startDate: '',
@@ -120,12 +126,13 @@ async function addValue(args: string[], username: string): Promise<string> {
   if (availabilitiesString !== '') {
     availabilities = JSON.parse(availabilitiesString);
   }
+  newAvailability.startDate = momentTimezone(newAvailability.startDate, dateFormat).tz(timezone, true).utc().format(dateFormat);
+  newAvailability.endDate = momentTimezone(newAvailability.endDate, dateFormat).tz(timezone, true).utc().format(dateFormat);
   availabilities.push(newAvailability);
   await bot.kvstore.put(teamName, nameSpaces.availabilities, username, JSON.stringify(availabilities));
-  return `Added availability of ${getAvailabilityString(newAvailability)} ${timezone}`;
+  return `Added availability of ${getAvailabilityString(newAvailability, timezone)} ${timezone}`;
 }
 
-// TO-DO: Add conversion of dates to user's timezone
 // TO-DO: Add conversion of dates to a specified timezone
 async function getValues(args: string[], username: string): Promise<string> {
   if (args[0]) {
@@ -154,7 +161,7 @@ async function getValues(args: string[], username: string): Promise<string> {
   }
   return `Availability for user ${username}:
       Default: ${defaultWorkLevel}
-      Time Zone: ${timezone} ${getAvailabilitiesString(availabilities)}`;
+      Time Zone: ${timezone} ${getAvailabilitiesString(availabilities, timezone)}`;
 
 }
 
@@ -174,7 +181,6 @@ async function setValue(args: string[], username: string): Promise<string> {
   }
 }
 
-// TO-DO: Add conversion of dates to user's timezone
 async function rmValue(args: string[], username: string): Promise<string> {
   let timezone = (await bot.kvstore.get(teamName, nameSpaces.timezones, username)).entryValue;
   if (timezone === '') {
@@ -197,17 +203,18 @@ async function rmValue(args: string[], username: string): Promise<string> {
     let defaultWorkLevel = (await bot.kvstore.get(teamName, nameSpaces.defaultWorkLevels, username)).entryValue;
     return `Which availability would you like to remove?
       Default: ${defaultWorkLevel}
-      Time Zone: ${timezone} ${getAvailabilitiesString(availabilities)}
+      Time Zone: ${timezone} ${getAvailabilitiesString(availabilities, timezone)}
       Respond with /avail rm #`;
   }
   else if (args[0] && !isNaN(Number(args[0]))) {
     let availabilitiesString = (await bot.kvstore.get(teamName, nameSpaces.availabilities, username)).entryValue;
-    let availabilities: object[] = [];
+    let availabilities: Availability[] = [];
     if (availabilitiesString !== '') {
       availabilities = JSON.parse(availabilitiesString);
     }
 
-    if (availabilities[Number(args[0]) - 1]) {
+    let availabilityToRemove = availabilities[Number(args[0]) - 1];
+    if (availabilityToRemove) {
       availabilities.splice(Number(args[0]) - 1, 1);
     }
     else {
@@ -215,11 +222,11 @@ async function rmValue(args: string[], username: string): Promise<string> {
     }
 
     await bot.kvstore.put(teamName, nameSpaces.availabilities, username, JSON.stringify(availabilities));
-    return `Removed availability of 0% for 3/25/2020 3/27/2020 ${timezone}`;
+    if (availabilityToRemove) {
+      return `Removed availability ${getAvailabilityString(availabilityToRemove, timezone)}`;
+    }
   }
-  else {
-    return writeArgsErrorMessage(args);
-  }
+  return writeArgsErrorMessage(args);
 }
 
 async function msgReply(message: MsgSummary): Promise<string> {
