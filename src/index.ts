@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import Bot from 'keybase-bot'
 import { MsgSummary } from 'keybase-bot/lib/types/chat1'
+import moment, { Moment } from 'moment'
 
 const bot = new Bot();
 const commandPrefix: string = '/avail ';
@@ -43,7 +44,11 @@ const getAvailabilityString = (availability: Availability): string => {
 
 // TO-DO: Implement validation
 const isValidDate = (date: string): boolean => {
-  return true;
+  let validatedDate:Moment = moment(date, 'M/DD/YYYY', true);
+  if (validatedDate.isValid()) {
+    return true;
+  }
+  return false;
 }
 const isValidTimezone = (timezone: string): boolean => {
   return true;
