@@ -2,6 +2,7 @@
 import Bot from 'keybase-bot'
 import { MsgSummary } from 'keybase-bot/lib/types/chat1'
 import moment, { Moment } from 'moment'
+import momentTimezone from 'moment-timezone'
 
 const bot = new Bot();
 const commandPrefix: string = '/avail ';
@@ -15,6 +16,7 @@ const configKeys = {
   default: 'default',
   timezone: 'timezone'
 };
+const momentTimezoneNames = momentTimezone.tz.names();
 const nameSpaces = {
   availabilities: 'AgentAvailability.Availabilities',
   defaultWorkLevels: 'AgentAvailability.DefaultWorkLevels',
@@ -44,7 +46,6 @@ const getAvailabilityString = (availability: Availability): string => {
   return `[${availability.startDate} - ${availability.endDate}] ${availability.workLevel}`;
 }
 
-// TO-DO: Implement validation
 const isValidDate = (date: string): boolean => {
   let validatedDate: Moment = moment(date, 'M/DD/YYYY', true);
   if (validatedDate.isValid()) {
@@ -54,7 +55,10 @@ const isValidDate = (date: string): boolean => {
 }
 
 const isValidTimezone = (timezone: string): boolean => {
-  return true;
+  if (momentTimezoneNames.indexOf(timezone) > -1) {
+    return true;
+  }
+  return false;
 }
 
 const isValidUsername = (username: string): boolean => {
@@ -81,6 +85,7 @@ const timezoneNotSetErrormessage = (username: string): string => {
 }
 
 // TO-DO: Add conversion of dates to user's timezone
+// TO-DO: Add conversion of dates to UTC timezone
 async function addValue(args: string[], username: string): Promise<string> {
   let newAvailability: Availability = {
     startDate: '',

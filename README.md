@@ -1,6 +1,8 @@
 # AgentAvailability
 
-This Keybase bot is used to signal dOrg Agent availability. 
+This Keybase bot is used to signal dOrg Agent availability.
+Timezones must a valid Moment timezone name. 
+See examples in the zones properties [here](https://github.com/moment/moment-timezone/blob/develop/data/meta/latest.json).
 
 ## Example usage
 
@@ -8,7 +10,7 @@ This Keybase bot is used to signal dOrg Agent availability.
 User: /avail get
 Bot: Availability for user usera:
 Default: 50%
-Time Zone: EST (-05:00)
+Time Zone: America/New_York
 - [3/25/2020 - 3/27/2020] 0%
 - [3/28/2020 - 4/28/2020] 50%
 - [4/29/2020 - 5/01/2020] 25%
@@ -24,7 +26,7 @@ Bot: usera has not set their availability
 User: /avail get userb
 Bot: Availability for user userb:
 Default: 50%
-Time Zone: EST (-05:00)
+Time Zone: America/New_York
 - [3/25/2020 - 3/27/2020] 0%
 - [3/28/2020 - 4/28/2020] 50%
 - [4/29/2020 - 5/01/2020] 25%
@@ -32,12 +34,16 @@ Time Zone: EST (-05:00)
 ```
 
 ```
-User: /avail get userb +01:00
+User: /avail get userb America/Los_Angeles
 Bot: Availability for user userb:
 Default: 50%
-Time Zone: CET (+01:00)
+Time Zone: America/Los_Angeles
+- [3/25/2020 - 3/27/2020] 0%
+- [3/28/2020 - 4/28/2020] 50%
+- [4/29/2020 - 5/01/2020] 25%
+- [5/02/2020 - 5/10/2020] 75%
 ```
-Uses specified time zone "CET" instead of userb's time zone of "EST"
+Uses specified time zone "America/Los_Angeles" instead of userb's time zone of "America/New_York"
 
 ```
 User: /avail set default 80%
@@ -50,28 +56,53 @@ Bot: Please set your time zone first
 ```
 
 ```
-User: /avail set timezone CET
-Bot: Your time zone has been updated to CET (+01:00)
+User: /avail set timezone America/New_York
+Bot: Your time zone has been updated to America/New_York
 ```
 
 ```
 User: /avail add 0% 7/10/2020 7/30/2020
-Bot: Added availability of 0% for 7/10/2020 7/30/2020 CET (+01:00)
+Bot: Added availability of 0% for 7/10/2020 7/30/2020 America/Los_Angeles
 ```
 
 ```
 User: /avail rm
 Bot: Which availability would you like to remove?
 Default: 50%
-Time Zone: EST (-05:00)
+Time Zone: America/New_York
 1. [3/25/2020 - 3/27/2020] 0%
 2. [3/28/2020 - 4/28/2020] 50%
 3. [4/29/2020 - 5/01/2020] 25%
 4. [5/02/2020 - 5/10/2020] 75%
 Respond with /avail rm #
 User: /avail rm 1
-Bot: Removed availability of 0% for 3/25/2020 3/27/2020 EST (-05:00)
+Bot: Removed availability of 0% for 3/25/2020 3/27/2020 America/New_York
 ```
+
+## Development tasks to do
+* Add better validation fail messages
+* Add logging
+* Refactor
+* Deploy
+* (Optional) Add a help verb to display docs for different commands, example: 
+```
+User: /avail help
+Bot: Usage: /avail [verb] [parameter1] [parameter2] [parameter3]
+Verbs:
+get
+set
+rm
+add
+```
+```
+User: /avail help add
+Bot: Usage: /avail add [workLevel%] [MM/DD/YYYY] [MM/DD/YYYY]
+Examples: /avail add 0% 7/10/2020 7/30/2020
+/avail add 50% 7/10/2020
+```
+* (Optional) Add CI/CD
+* (Optional) Figure out a simple way to validate keybase usernames:
+May need to add the [Go client](https://github.com/keybase/client) to project or implement own [user endpoint call.](https://keybase.io/docs/api/1.0/call/user/lookup)
 
 ## Running locally
 

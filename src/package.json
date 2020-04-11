@@ -1,7 +1,10 @@
 {
   "dependencies": {
+    "@types/moment-timezone": "^0.5.13",
     "@types/node": "^13.11.1",
+    "add": "^2.0.6",
     "keybase-bot": "^3.6.1",
-    "moment": "^2.24.0"
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.28"
   }
 }
