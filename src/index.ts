@@ -23,6 +23,8 @@ const nameSpaces = {
 const paperkey = process.env.KB_PAPERKEY;
 const teamName = process.env.KB_TEAMNAME;
 const username = process.env.KB_USERNAME;
+// Regex for a valid integer 0-100 followed by a %
+const workLevelRegex = /^(?:100|[1-9]?[0-9])%{1}$/
 
 type Availability = {
   startDate: string,
@@ -33,7 +35,7 @@ type Availability = {
 const getAvailabilitiesString = (availabilities: Availability[]): string => {
   let availabilitiesString = '';
   availabilities.forEach((item, index) => {
-    availabilitiesString += `\r\n${index+1}. [${item.startDate} - ${item.endDate}] ${item.workLevel}`;
+    availabilitiesString += `\r\n${index + 1}. [${item.startDate} - ${item.endDate}] ${item.workLevel}`;
   });
   return availabilitiesString;
 }
@@ -44,25 +46,24 @@ const getAvailabilityString = (availability: Availability): string => {
 
 // TO-DO: Implement validation
 const isValidDate = (date: string): boolean => {
-  let validatedDate:Moment = moment(date, 'M/DD/YYYY', true);
+  let validatedDate: Moment = moment(date, 'M/DD/YYYY', true);
   if (validatedDate.isValid()) {
     return true;
   }
   return false;
 }
+
 const isValidTimezone = (timezone: string): boolean => {
   return true;
 }
+
 const isValidUsername = (username: string): boolean => {
   return true;
 }
+
 const isValidWorkLevel = (worklevel: string): boolean => {
-  // TO-DO: Fix percentage validation logic
-  if (worklevel &&
-    worklevel[worklevel.length - 1] === '%') { //&&
-    //worklevel.slice(worklevel.length - 2).split('').every(char => char >= '0' && char <= '9')) { //&&
-    //Number(worklevel.slice(worklevel.length - 2)) <= 100) {
-    return true;
+  if (workLevelRegex.test(worklevel)) {
+    return true
   }
   return false;
 }
@@ -187,7 +188,7 @@ async function rmValue(args: string[], username: string): Promise<string> {
     if (availabilities.length === 0) {
       return `${username} has not set their availability`
     }
-    
+
     let defaultWorkLevel = (await bot.kvstore.get(teamName, nameSpaces.defaultWorkLevels, username)).entryValue;
     return `Which availability would you like to remove?
       Default: ${defaultWorkLevel}
@@ -201,8 +202,8 @@ async function rmValue(args: string[], username: string): Promise<string> {
       availabilities = JSON.parse(availabilitiesString);
     }
 
-    if (availabilities[Number(args[0])-1]) {
-      availabilities.splice(Number(args[0])-1, 1);
+    if (availabilities[Number(args[0]) - 1]) {
+      availabilities.splice(Number(args[0]) - 1, 1);
     }
     else {
       return writeArgsErrorMessage(args);
