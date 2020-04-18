@@ -69,9 +69,6 @@ Bot: Removed availability of 0% for 3/25/2020 3/27/2020 America/New_York
 ```
 
 ## Development tasks to do
-* Add better validation fail messages
-* Add logging & better error handling
-* Refactor
 * Deploy
 * Add conversion to a specified time zone, example:
 ```
