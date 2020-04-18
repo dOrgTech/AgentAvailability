@@ -3,6 +3,7 @@
 This Keybase bot is used to signal dOrg Agent availability.
 Timezones must a valid Moment timezone name. 
 See examples in the zones properties [here](https://github.com/moment/moment-timezone/blob/develop/data/meta/latest.json).
+Noon in the user's local is used as the assumed time of the provided availability date to make timezone conversions more consistent.
 
 ## Example usage
 
@@ -68,8 +69,6 @@ Bot: Removed availability of 0% for 3/25/2020 3/27/2020 America/New_York
 ```
 
 ## Development tasks to do
-* Fix bug where dates are adjusted improperly:
-local->UTC->local isn't working properly
 * Add better validation fail messages
 * Add logging & better error handling
 * Refactor

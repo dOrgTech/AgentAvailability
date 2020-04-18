@@ -4,6 +4,7 @@ import { MsgSummary } from 'keybase-bot/lib/types/chat1'
 import moment, { Moment } from 'moment'
 import momentTimezone from 'moment-timezone'
 
+const assumedTime = '12:00';
 const bot = new Bot();
 const commandPrefix: string = '/avail ';
 const commandVerbs = {
@@ -17,6 +18,7 @@ const configKeys = {
   timezone: 'timezone'
 };
 const dateFormat = 'M/D/YYYY';
+const inputDateFormat = 'M/D/YYYY HH:mm';
 const momentTimezoneNames = momentTimezone.tz.names();
 const nameSpaces = {
   availabilities: 'AgentAvailability.Availabilities',
@@ -49,8 +51,8 @@ const getAvailabilitiesString = (availabilities: Availability[], timezone: strin
 }
 
 const getAvailabilityString = (availability: Availability, timezone: string): string => {
-  let startDate = momentTimezone.utc(availability.startDate, dateFormat).tz(timezone).format(dateFormat);
-  let endDate = momentTimezone.utc(availability.endDate, dateFormat).tz(timezone).format(dateFormat);
+  let startDate = momentTimezone(availability.startDate).tz(timezone).format(dateFormat);
+  let endDate = momentTimezone(availability.endDate).tz(timezone).format(dateFormat);
   return `[${startDate} - ${endDate}] ${availability.workLevel}`;
 }
 
@@ -126,14 +128,13 @@ async function addValue(args: string[], username: string): Promise<string> {
   if (availabilitiesString !== '') {
     availabilities = JSON.parse(availabilitiesString);
   }
-  newAvailability.startDate = momentTimezone(newAvailability.startDate, dateFormat).tz(timezone, true).utc().format(dateFormat);
-  newAvailability.endDate = momentTimezone(newAvailability.endDate, dateFormat).tz(timezone, true).utc().format(dateFormat);
+  newAvailability.startDate = momentTimezone(newAvailability.startDate + " " + assumedTime, inputDateFormat, timezone).format();
+  newAvailability.endDate = momentTimezone(newAvailability.endDate + " " + assumedTime, inputDateFormat, timezone).format();
   availabilities.push(newAvailability);
   await bot.kvstore.put(teamName, nameSpaces.availabilities, username, JSON.stringify(availabilities));
   return `Added availability of ${getAvailabilityString(newAvailability, timezone)} ${timezone}`;
 }
 
-// TO-DO: Add conversion of dates to a specified timezone
 async function getValues(args: string[], username: string): Promise<string> {
   if (args[0]) {
     if (isValidUsername(args[0])) {
