@@ -128,8 +128,16 @@ async function addValue(args: string[], username: string): Promise<string> {
   if (availabilitiesString !== '') {
     availabilities = JSON.parse(availabilitiesString);
   }
-  newAvailability.startDate = momentTimezone(newAvailability.startDate + " " + assumedTime, inputDateFormat, timezone).format();
-  newAvailability.endDate = momentTimezone(newAvailability.endDate + " " + assumedTime, inputDateFormat, timezone).format();
+  let startDate = momentTimezone(newAvailability.startDate + " " + assumedTime, inputDateFormat, timezone);
+  if (!startDate.isValid()) {
+    return `Invalid date: ${newAvailability.startDate}`;
+  }
+  let endDate = momentTimezone(newAvailability.endDate + " " + assumedTime, inputDateFormat, timezone);
+  if (!endDate.isValid()) {
+    return `Invalid date: ${newAvailability.endDate}`;
+  }
+  newAvailability.startDate = startDate.format();
+  newAvailability.endDate = endDate.format();
   availabilities.push(newAvailability);
   await bot.kvstore.put(teamName, nameSpaces.availabilities, username, JSON.stringify(availabilities));
   return `Added availability of ${getAvailabilityString(newAvailability, timezone)} ${timezone}`;
