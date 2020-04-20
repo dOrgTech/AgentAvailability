@@ -124,3 +124,6 @@ dist
 .yarn/unplugged
 .yarn/build-state.yml
 .pnp.*
+
+launch.json
+tasks.json
