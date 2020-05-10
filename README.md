@@ -68,8 +68,12 @@ User: /avail rm 1
 Bot: Removed availability of 0% for 3/25/2020 3/27/2020 America/New_York
 ```
 
-## Development tasks to do
-* Deploy
+## Tasks to do
+* Refactor
+* Setting up test users to test multiple users functionality
+* Change /avail get to get all users' availability
+* Add /avail me for getting your own user's availability
+* Add permissions to limit it to to dOrg team
 * Add conversion to a specified time zone, example:
 ```
 User: /avail get userb America/Los_Angeles
@@ -98,6 +102,8 @@ Bot: Usage: /avail add [workLevel%] [MM/DD/YYYY] [MM/DD/YYYY]
 Examples: /avail add 0% 7/10/2020 7/30/2020
 /avail add 50% 7/10/2020
 ```
+* Deploy
+* Make proposal to dOrg DAO for bounty completion
 * (Optional) Add CI/CD
 * (Optional) Figure out a simple way to validate keybase usernames:
 May need to add the [Go client](https://github.com/keybase/client) to project or implement own [user endpoint call.](https://keybase.io/docs/api/1.0/call/user/lookup)
