@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 import { AgentAvailabilityBot } from './agentAvailabilityBot'
 
 const agentAvailabilityBot = new AgentAvailabilityBot();

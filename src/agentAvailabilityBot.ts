@@ -39,27 +39,30 @@ export class AgentAvailabilityBot extends Bot {
 
     constructor() {
         super();
-        this.initBot();
     }
 
-    initBot() {
-        Bot.prototype.init.apply(this, [this.username || '', this.paperkey || ''])            
-            .then(this.startUp)
+    init(): Promise<void> {
+        return Bot.prototype.init.apply(this, [this.username || '', this.paperkey || ''])            
+            .then(() => { 
+                this.startUp();  
+            })
             .catch((error: any) => {
                 console.error(error);
             })
-            .then(this.deinit);
+            .then(() => {
+                this.deinit();
+            })
     }
 
-    deinitBot() {
-        Bot.prototype.deinit.call(this).then(() => process.exit());
+    deinit(): Promise<void> {
+        return Bot.prototype.deinit.call(this).then(() => process.exit());
     }
 
     startUp() {
-        console.log('Starting up', Bot.prototype.myInfo.call(this)?.username, Bot.prototype.myInfo.call(this)?.devicename);
-        console.log(`Watching for new messages to ${Bot.prototype.myInfo.call(this)?.username} starting with ${this.commandPrefix}`);
+        console.log('Starting up', this.myInfo.call(this)?.username, this.myInfo.call(this)?.devicename);
+        console.log(`Watching for new messages to ${this.myInfo.call(this)?.username} starting with ${this.commandPrefix}`);
         const onError = (e: any) => console.error(e);
-        Bot.prototype.chat.watchAllChannelsForNewMessages.apply(this, [this.onMessage, onError]);
+        this.chat.watchAllChannelsForNewMessages.apply(this, [this.onMessage, onError]);
     }
     async onMessage(message: MsgSummary): Promise<void> {
         if (message?.content.type === 'text') {
