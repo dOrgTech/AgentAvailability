@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { AgentAvailabilityBot } from './bot/AgentAvailabilityBot'
+import AgentAvailabilityBot from './bot/AgentAvailabilityBot'
 
 const agentAvailabilityBot = new AgentAvailabilityBot();
 

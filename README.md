@@ -69,11 +69,10 @@ Bot: Removed availability of 0% for 3/25/2020 3/27/2020 America/New_York
 ```
 
 ## Tasks to do
-* Refactor
-* Setting up test users to test multiple users functionality
 * Change /avail get to get all users' availability
 * Add /avail me for getting your own user's availability
 * Add permissions to limit it to to dOrg team
+* Setup test users to test multiple users functionality
 * Add conversion to a specified time zone, example:
 ```
 User: /avail get userb America/Los_Angeles
@@ -86,7 +85,7 @@ Time Zone: America/Los_Angeles
 - [5/02/2020 - 5/10/2020] 75%
 ```
 Uses specified time zone "America/Los_Angeles" instead of userb's time zone of "America/New_York"
-* (Optional) Add a help verb to display docs for different commands, example: 
+* Add a help verb to display docs for different commands, example: 
 ```
 User: /avail help
 Bot: Usage: /avail [verb] [parameter1] [parameter2] [parameter3]
@@ -104,8 +103,8 @@ Examples: /avail add 0% 7/10/2020 7/30/2020
 ```
 * Deploy
 * Make proposal to dOrg DAO for bounty completion
-* (Optional) Add CI/CD
-* (Optional) Figure out a simple way to validate keybase usernames:
+* Add CI/CD
+* Figure out a simple way to validate keybase usernames:
 May need to add the [Go client](https://github.com/keybase/client) to project or implement own [user endpoint call.](https://keybase.io/docs/api/1.0/call/user/lookup)
 
 ## Running locally

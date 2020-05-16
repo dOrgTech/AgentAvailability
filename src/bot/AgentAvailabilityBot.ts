@@ -5,7 +5,7 @@ import Bot from 'keybase-bot'
 import { MsgSummary } from 'keybase-bot/lib/types/chat1'
 import momentTimezone from 'moment-timezone'
 
-export class AgentAvailabilityBot extends Bot {
+export default class AgentAvailabilityBot extends Bot {
     assumedTime: string | undefined = process.env.KEYBASE_AGENTAVAILABILITYBOT_ASSUMEDTIME;
     commandPrefix: string | undefined = process.env.KEYBASE_AGENTAVAILABILITYBOT_COMMANDPREFIX;
     commandVerbs: { [id: string]: string | undefined; } = {
