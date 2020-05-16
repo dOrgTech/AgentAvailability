@@ -42,34 +42,43 @@ export class AgentAvailabilityBot extends Bot {
     }
 
     init(): Promise<void> {
-        return Bot.prototype.init.apply(this, [this.username || '', this.paperkey || ''])            
-            .then(() => { 
-                this.startUp();  
+        return Bot.prototype.init.apply(this, [this.username || '', this.paperkey || ''])
+            .then(() => {
+                this.startUp();
             })
             .catch((error: any) => {
                 console.error(error);
-            })
-            .then(() => {
                 this.deinit();
             })
     }
 
     deinit(): Promise<void> {
+        console.log('Shutting down...');
         return Bot.prototype.deinit.call(this).then(() => process.exit());
     }
 
     startUp() {
-        console.log('Starting up', this.myInfo.call(this)?.username, this.myInfo.call(this)?.devicename);
+        console.log('Starting up...', this.myInfo.call(this)?.username, this.myInfo.call(this)?.devicename);
         console.log(`Watching for new messages to ${this.myInfo.call(this)?.username} starting with ${this.commandPrefix}`);
         const onError = (e: any) => console.error(e);
-        this.chat.watchAllChannelsForNewMessages.apply(this, [this.onMessage, onError]);
+        const onMessage = async (message: MsgSummary) => {
+            if (message?.content.type === 'text') {
+                const prefix = message?.content?.text?.body.slice(0, this.commandPrefix.length);
+                if (prefix === this.commandPrefix) {
+                    const reply = { body: await this.msgReply(message) };
+                    this.chat.send(message.conversationId, reply);
+                }
+            }
+        }
+        this.chat.watchAllChannelsForNewMessages(onMessage, onError);
     }
+
     async onMessage(message: MsgSummary): Promise<void> {
         if (message?.content.type === 'text') {
             const prefix = message?.content?.text?.body.slice(0, this.commandPrefix.length);
             if (prefix === this.commandPrefix) {
                 const reply = { body: await this.msgReply(message) };
-                Bot.prototype.chat.send.apply(this, [message.conversationId, reply]);
+                this.chat.send(message.conversationId, reply);
             }
         }
     }
@@ -137,7 +146,7 @@ export class AgentAvailabilityBot extends Bot {
             endDate: '',
             workLevel: ''
         }
-        let timezone = (await Bot.prototype.kvstore.get.apply(this, [this.teamName, this.nameSpaces.timezones, username])).entryValue
+        let timezone = (await this.kvstore.get(this.teamName, this.nameSpaces.timezones, username)).entryValue
         if (timezone === '') {
             return this.timezoneNotSetErrormessage(username);
         }
@@ -160,7 +169,7 @@ export class AgentAvailabilityBot extends Bot {
             newAvailability.endDate = args[2];
         }
 
-        let availabilitiesString = (await Bot.prototype.kvstore.get.apply(this, [this.teamName, this.nameSpaces.availabilities, username])).entryValue;
+        let availabilitiesString = (await this.kvstore.get(this.teamName, this.nameSpaces.availabilities, username)).entryValue;
         let availabilities: object[] = [];
         if (availabilitiesString !== '') {
             availabilities = JSON.parse(availabilitiesString);
@@ -176,7 +185,7 @@ export class AgentAvailabilityBot extends Bot {
         newAvailability.startDate = startDate.format();
         newAvailability.endDate = endDate.format();
         availabilities.push(newAvailability);
-        await Bot.prototype.kvstore.put.apply(this, [this.teamName, this.nameSpaces.availabilities, username, JSON.stringify(availabilities)]);
+        await this.kvstore.put(this.teamName, this.nameSpaces.availabilities, username, JSON.stringify(availabilities));
         return `Added availability of ${this.getAvailabilityString(newAvailability, timezone)} ${timezone}`;
     }
 
@@ -190,9 +199,9 @@ export class AgentAvailabilityBot extends Bot {
             }
         }
 
-        let availabilitiesString = (await Bot.prototype.kvstore.get.apply(this, [this.teamName, this.nameSpaces.availabilities, username])).entryValue;
-        let defaultWorkLevel = (await Bot.prototype.kvstore.get.apply(this, [this.teamName, this.nameSpaces.defaultWorkLevels, username])).entryValue;
-        let timezone = (await Bot.prototype.kvstore.get.apply(this, [this.teamName, this.nameSpaces.timezones, username])).entryValue;
+        let availabilitiesString = (await this.kvstore.get(this.teamName, this.nameSpaces.availabilities, username)).entryValue;
+        let defaultWorkLevel = (await this.kvstore.get(this.teamName, this.nameSpaces.defaultWorkLevels, username)).entryValue;
+        let timezone = (await this.kvstore.get(this.teamName, this.nameSpaces.timezones, username)).entryValue;
         if (timezone === '') {
             return this.timezoneNotSetErrormessage(username);
         }
@@ -213,12 +222,12 @@ Time Zone: ${timezone} ${this.getAvailabilitiesString(availabilities, timezone)}
     async setValue(args: string[], username: string): Promise<string> {
         if (args[0] === this.configKeys.default &&
             this.isValidWorkLevel(args[1])) {
-            await Bot.prototype.kvstore.put.apply(this, [this.teamName, this.nameSpaces.defaultWorkLevels, username, args[1]]);
+            await this.kvstore.put(this.teamName, this.nameSpaces.defaultWorkLevels, username, args[1]);
             return `Your default availability has been set to ${args[1]}`;
         }
         else if (args[0] === this.configKeys.timezone &&
             this.isValidTimezone(args[1])) {
-            await Bot.prototype.kvstore.put.apply(this, [this.teamName, this.nameSpaces.timezones, username, args[1]]);
+            await this.kvstore.put(this.teamName, this.nameSpaces.timezones, username, args[1]);
             return `Your time zone has been updated to ${args[1]}`;
         }
         else {
@@ -227,13 +236,13 @@ Time Zone: ${timezone} ${this.getAvailabilitiesString(availabilities, timezone)}
     }
 
     async rmValue(args: string[], username: string): Promise<string> {
-        let timezone = (await Bot.prototype.kvstore.get.apply(this, [this.teamName, this.nameSpaces.timezones, username])).entryValue;
+        let timezone = (await this.kvstore.get(this.teamName, this.nameSpaces.timezones, username)).entryValue;
         if (timezone === '') {
             return this.timezoneNotSetErrormessage(username);
         }
 
         if (args.length === 0) {
-            let availabilitiesString = (await Bot.prototype.kvstore.get.apply(this, [this.teamName, this.nameSpaces.availabilities, username])).entryValue;
+            let availabilitiesString = (await this.kvstore.get(this.teamName, this.nameSpaces.availabilities, username)).entryValue;
             let availabilities: Availability[] = [];
             if (availabilitiesString !== '') {
                 availabilities = JSON.parse(availabilitiesString);
@@ -245,14 +254,14 @@ Time Zone: ${timezone} ${this.getAvailabilitiesString(availabilities, timezone)}
                 return `${username} has not set their availability`
             }
 
-            let defaultWorkLevel = (await Bot.prototype.kvstore.get.apply(this, [this.teamName, this.nameSpaces.defaultWorkLevels, username])).entryValue;
+            let defaultWorkLevel = (await this.kvstore.get(this.teamName, this.nameSpaces.defaultWorkLevels, username)).entryValue;
             return `Which availability would you like to remove?
 Default: ${defaultWorkLevel}
 Time Zone: ${timezone} ${this.getAvailabilitiesString(availabilities, timezone)}
 Respond with /avail rm #`;
         }
         else if (args[0] && !isNaN(Number(args[0]))) {
-            let availabilitiesString = (await Bot.prototype.kvstore.get.apply(this, [this.teamName, this.nameSpaces.availabilities, username])).entryValue;
+            let availabilitiesString = (await this.kvstore.get(this.teamName, this.nameSpaces.availabilities, username)).entryValue;
             let availabilities: Availability[] = [];
             if (availabilitiesString !== '') {
                 availabilities = JSON.parse(availabilitiesString);
@@ -266,7 +275,7 @@ Respond with /avail rm #`;
                 return this.writeArgsErrorMessage(args);
             }
 
-            await Bot.prototype.kvstore.put.apply(this, [this.teamName, this.nameSpaces.availabilities, username, JSON.stringify(availabilities)]);
+            await this.kvstore.put(this.teamName, this.nameSpaces.availabilities, username, JSON.stringify(availabilities));
             if (availabilityToRemove) {
                 return `Removed availability ${this.getAvailabilityString(availabilityToRemove, timezone)}`;
             }
