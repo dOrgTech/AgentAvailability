@@ -130,9 +130,22 @@ Set up these two files in a `.vscode` folder at the root of the Git repository t
     "configurations": [
         {
             "env": {
-                "KB_USERNAME": "keybase_username",
-                "KB_PAPERKEY": "keybase_paperkey",
-                "KB_TEAMNAME": "keybase_teamname"
+                "KEYBASE_AGENTAVAILABILITYBOT_USERNAME": "keybase_username",
+                "KEYBASE_AGENTAVAILABILITYBOT_PAPERKEY": "keybase_paperkey",
+                "KEYBASE_AGENTAVAILABILITYBOT_TEAMNAME": "keybase_teamname",
+                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDPREFIX": "/avail ",
+                "KEYBASE_AGENTAVAILABILITYBOT_ASSUMEDTIME": "12:00",
+                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_ADD": "add",
+                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_GET": "get",
+                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_SET": "set",
+                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_RM": "rm",
+                "KEYBASE_AGENTAVAILABILITYBOT_CONFIGKEY_DEFAULT": "default",
+                "KEYBASE_AGENTAVAILABILITYBOT_CONFIGKEY_TIMEZONE": "timezone",
+                "KEYBASE_AGENTAVAILABILITYBOT_DATEFORMAT": "M/D/YYYY",
+                "KEYBASE_AGENTAVAILABILITYBOT_INPUTDATEFORMAT": "M/D/YYYY HH:mm",
+                "KEYBASE_AGENTAVAILABILITYBOT_NAMESPACE_AVAILABILITIES": "AgentAvailability.Availabilities",
+                "KEYBASE_AGENTAVAILABILITYBOT_NAMESPACE_DEFAULT": "AgentAvailability.DefaultWorkLevels",
+                "KEYBASE_AGENTAVAILABILITYBOT_NAMESPACE_TIMEZONES": "AgentAvailability.TimeZones",
             },
             "name": "Launch Program",
             "outFiles": [
