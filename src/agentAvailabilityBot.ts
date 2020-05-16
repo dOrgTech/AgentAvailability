@@ -41,20 +41,21 @@ export class AgentAvailabilityBot extends Bot {
         super();
     }
 
-    init(): Promise<void> {
-        return Bot.prototype.init.apply(this, [this.username || '', this.paperkey || ''])
-            .then(() => {
-                this.startUp();
-            })
-            .catch((error: any) => {
-                console.error(error);
-                this.deinit();
-            })
+    async initBot(): Promise<void> {
+        try {
+            await this.init(this.username || '', this.paperkey || '');
+            this.startUp();
+        }
+        catch (error) {
+            console.error(error);
+            await this.deinit();
+        }
     }
 
-    deinit(): Promise<void> {
+    async deinitBot(): Promise<void> {
         console.log('Shutting down...');
-        return Bot.prototype.deinit.call(this).then(() => process.exit());
+        await this.deinit();
+        return process.exit();
     }
 
     startUp() {

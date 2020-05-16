@@ -5,11 +5,11 @@ import { AgentAvailabilityBot } from './agentAvailabilityBot'
 const agentAvailabilityBot = new AgentAvailabilityBot();
 
 async function main() {
-  agentAvailabilityBot.init();
+  await agentAvailabilityBot.initBot();
 }
 
-process.on('SIGINT', agentAvailabilityBot.deinit);
-process.on('SIGTERM', agentAvailabilityBot.deinit);
+process.on('SIGINT', agentAvailabilityBot.deinitBot.bind(agentAvailabilityBot));
+process.on('SIGTERM', agentAvailabilityBot.deinitBot.bind(agentAvailabilityBot));
 
 (async () => {
   try {
