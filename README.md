@@ -68,11 +68,11 @@ User: /avail rm 1
 Bot: Removed availability of 0% for 3/25/2020 3/27/2020 America/New_York
 ```
 
-## Development tasks to do
-* Add better validation fail messages
-* Add logging & better error handling
-* Refactor
-* Deploy
+## Tasks to do
+* Change /avail get to get all users' availability
+* Add /avail me for getting your own user's availability
+* Add permissions to limit it to to dOrg team
+* Setup test users to test multiple users functionality
 * Add conversion to a specified time zone, example:
 ```
 User: /avail get userb America/Los_Angeles
@@ -85,7 +85,7 @@ Time Zone: America/Los_Angeles
 - [5/02/2020 - 5/10/2020] 75%
 ```
 Uses specified time zone "America/Los_Angeles" instead of userb's time zone of "America/New_York"
-* (Optional) Add a help verb to display docs for different commands, example: 
+* Add a help verb to display docs for different commands, example: 
 ```
 User: /avail help
 Bot: Usage: /avail [verb] [parameter1] [parameter2] [parameter3]
@@ -101,8 +101,10 @@ Bot: Usage: /avail add [workLevel%] [MM/DD/YYYY] [MM/DD/YYYY]
 Examples: /avail add 0% 7/10/2020 7/30/2020
 /avail add 50% 7/10/2020
 ```
-* (Optional) Add CI/CD
-* (Optional) Figure out a simple way to validate keybase usernames:
+* Deploy
+* Make proposal to dOrg DAO for bounty completion
+* Add CI/CD
+* Figure out a simple way to validate keybase usernames:
 May need to add the [Go client](https://github.com/keybase/client) to project or implement own [user endpoint call.](https://keybase.io/docs/api/1.0/call/user/lookup)
 
 ## Running locally
@@ -127,9 +129,22 @@ Set up these two files in a `.vscode` folder at the root of the Git repository t
     "configurations": [
         {
             "env": {
-                "KB_USERNAME": "keybase_username",
-                "KB_PAPERKEY": "keybase_paperkey",
-                "KB_TEAMNAME": "keybase_teamname"
+                "KEYBASE_AGENTAVAILABILITYBOT_USERNAME": "keybase_username",
+                "KEYBASE_AGENTAVAILABILITYBOT_PAPERKEY": "keybase_paperkey",
+                "KEYBASE_AGENTAVAILABILITYBOT_TEAMNAME": "keybase_teamname",
+                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDPREFIX": "/avail ",
+                "KEYBASE_AGENTAVAILABILITYBOT_ASSUMEDTIME": "12:00",
+                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_ADD": "add",
+                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_GET": "get",
+                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_SET": "set",
+                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_RM": "rm",
+                "KEYBASE_AGENTAVAILABILITYBOT_CONFIGKEY_DEFAULT": "default",
+                "KEYBASE_AGENTAVAILABILITYBOT_CONFIGKEY_TIMEZONE": "timezone",
+                "KEYBASE_AGENTAVAILABILITYBOT_DATEFORMAT": "M/D/YYYY",
+                "KEYBASE_AGENTAVAILABILITYBOT_INPUTDATEFORMAT": "M/D/YYYY HH:mm",
+                "KEYBASE_AGENTAVAILABILITYBOT_NAMESPACE_AVAILABILITIES": "AgentAvailability.Availabilities",
+                "KEYBASE_AGENTAVAILABILITYBOT_NAMESPACE_DEFAULT": "AgentAvailability.DefaultWorkLevels",
+                "KEYBASE_AGENTAVAILABILITYBOT_NAMESPACE_TIMEZONES": "AgentAvailability.TimeZones",
             },
             "name": "Launch Program",
             "outFiles": [
