@@ -274,6 +274,13 @@ Respond with /avail rm #`;
 
     async _msgReply(message: MsgSummary): Promise<string> {
         let args: string[] = message?.content?.text?.body.split(" ") || [];
+
+        if (args.length === 0) {
+            let errorMessage: string = `No command given.`;
+            console.error(errorMessage);
+            return errorMessage;
+        }
+
         if (args[1] === this.commandVerbs.add) {
             args.splice(0, 2);
             return this._addValue(args, message?.sender?.username || '');
