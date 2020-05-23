@@ -1,21 +1,25 @@
-#!/usr/bin/env node
-
 import AgentAvailabilityBot from './bot/AgentAvailabilityBot'
 
-const agentAvailabilityBot = new AgentAvailabilityBot();
-
 async function main() {
+  const agentAvailabilityBot = new AgentAvailabilityBot();
   await agentAvailabilityBot.initBot();
+  process.on('SIGINT',
+    agentAvailabilityBot.deinitBot.bind(agentAvailabilityBot)
+  );
+  process.on('SIGTERM',
+    agentAvailabilityBot.deinitBot.bind(agentAvailabilityBot)
+  );
 }
 
-process.on('SIGINT', agentAvailabilityBot.deinitBot.bind(agentAvailabilityBot));
-process.on('SIGTERM', agentAvailabilityBot.deinitBot.bind(agentAvailabilityBot));
+if (require.main === module) {
+  main()
+    .then(() => console.log('done'))
+    .catch(err => {
+      console.error(err);
+      process.exit(1);
+    });
+}
 
-(async () => {
-  try {
-    var text = await main();
-    console.log(text);
-  } catch (e) {
-    console.log(e)
-  }
-})();
+export {
+  AgentAvailabilityBot
+}
