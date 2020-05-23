@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "build": "tsc"
+  },
   "dependencies": {
     "@types/moment-timezone": "^0.5.13",
     "@types/node": "^13.11.1",
