@@ -119,11 +119,10 @@ dist
 .vscode-test
 
 # yarn v2
-
 .yarn/cache
 .yarn/unplugged
 .yarn/build-state.yml
 .pnp.*
 
-launch.json
-tasks.json
+# VSCode configuration files
+.vscode/*
