@@ -8,6 +8,7 @@
     "@types/node": "^13.11.1",
     "@types/semver": "^7.2.0",
     "add": "^2.0.6",
+    "dotenv": "^8.2.0",
     "keybase-bot": "^3.6.1",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.28",

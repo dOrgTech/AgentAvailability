@@ -73,15 +73,25 @@ Bot: Removed availability of 0% for 3/25/2020 3/27/2020 America/New_York
 
 ## Running Locally
 
-1. Use the proper version of Node & NPM
-```base
-nvm use $(cat .nvmrc)
-```
-2. Install dependencies
+1. Create a .env file in the root of the src/ folder, using .env.example as a base and replacing the values of 
+KEYBASE_AGENTAVAILABILITYBOT_USERNAME, KEYBASE_AGENTAVAILABILITYBOT_PAPERKEY, KEYBASE_AGENTAVAILABILITYBOT_TEAMNAME as appropriate. 
+2. Use the proper version of Node & NPM
 ```bash
-yarn
+nvm use
 ```
-3. 
+3. Install dependencies
+```bash
+yarn install
+```
+4. Compile TypeScript into JavaScript
+```bash
+cd src
+npx tsc --project ../tsconfig.json
+```
+5. Run compiled JavaScript on Node
+```bash
+node output/src/index.js
+```
 
 ## Debugging With VSCode
 
@@ -94,7 +104,7 @@ Add this file to your `.vscode` folder at the root of the Git repository to debu
     "configurations": [
         {
             "name": "Launch Program",
-            "program": "${workspaceFolder}//src//output//index.js",
+            "program": "${workspaceFolder}/src/output/src/index.js",
             "request": "launch",
             "smartStep": true,
             "sourceMaps": true,

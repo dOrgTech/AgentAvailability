@@ -1,4 +1,7 @@
 import AgentAvailabilityBot from './bot/AgentAvailabilityBot'
+import dotenv from 'dotenv'
+
+dotenv.config();
 
 async function main() {
   const agentAvailabilityBot = new AgentAvailabilityBot();
