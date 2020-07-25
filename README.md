@@ -93,6 +93,16 @@ npx tsc --project ../tsconfig.json
 node output/src/index.js
 ```
 
+## Running Locally via Docker
+
+1. Create a .env file in the root of the src/ folder, using .env.example as a base and replacing the values of 
+KEYBASE_AGENTAVAILABILITYBOT_USERNAME, KEYBASE_AGENTAVAILABILITYBOT_PAPERKEY, KEYBASE_AGENTAVAILABILITYBOT_TEAMNAME as appropriate. 
+2. Run the following commands in the root of the repository:
+```bash
+docker build -t "keybase-docker-local" .
+sudo docker run --env-file src/.env --rm keybase-docker-local
+```
+
 ## Debugging With VSCode
 
 Add this file to your `.vscode` folder at the root of the Git repository to debug within Visual Studio Code:

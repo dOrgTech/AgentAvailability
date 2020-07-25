@@ -1,4 +1,13 @@
 {
+  "name": "agent-availability",
+  "version": "0.0.1",
+  "main": "/src/output/src/index.js",
+  "description": "A Keybase bot used to signal dOrg Agent availability.",
+  "author": {
+    "email": "ben@dorg.tech",
+    "name": "Ben Walker",
+    "url": "https://dorg.tech"
+  },
   "scripts": {
     "build": "tsc",
     "requirements-check": "tsc src/scripts/check_node_version.ts"
