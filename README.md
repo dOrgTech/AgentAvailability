@@ -1,14 +1,13 @@
 # AgentAvailability
 
-This Keybase bot is used to signal dOrg Agent availability.
-Timezones must a valid Moment timezone name. 
-See examples in the zones properties [here](https://github.com/moment/moment-timezone/blob/develop/data/meta/latest.json).
-Noon in the user's local is used as the assumed time of the provided availability date to make timezone conversions more consistent.
+A Keybase bot used to signal dOrg Agent availability.
 
-## Example usage
-
+## Usage
+### Get Availability
 ```
 User: /avail get
+```
+```
 Bot: Availability for user usera:
 Default: 50%
 Time Zone: America/New_York
@@ -49,6 +48,10 @@ User: /avail set timezone America/New_York
 Bot: Your time zone has been updated to America/New_York
 ```
 
+**NOTE:** Timezones must a valid Moment timezone name. 
+See examples in the zones properties [here](https://github.com/moment/moment-timezone/blob/develop/data/meta/latest.json).
+Noon in the user's local is used as the assumed time of the provided availability date to make timezone conversions more consistent.
+
 ```
 User: /avail add 0% 7/10/2020 7/30/2020
 Bot: Added availability of 0% for 7/10/2020 7/30/2020 America/Los_Angeles
@@ -68,7 +71,67 @@ User: /avail rm 1
 Bot: Removed availability of 0% for 3/25/2020 3/27/2020 America/New_York
 ```
 
+## Running Locally
+
+1. Create a .env file in the root of the src/ folder, using .env.example as a base and replacing the values of 
+KEYBASE_AGENTAVAILABILITYBOT_USERNAME, KEYBASE_AGENTAVAILABILITYBOT_PAPERKEY, KEYBASE_AGENTAVAILABILITYBOT_TEAMNAME as appropriate. 
+2. Use the proper version of Node & NPM
+```bash
+nvm use
+```
+3. Install dependencies
+```bash
+yarn install
+```
+4. Compile TypeScript into JavaScript
+```bash
+cd src
+npx tsc --project ../tsconfig.json
+```
+5. Run compiled JavaScript on Node
+```bash
+node output/src/index.js
+```
+
+## Running Locally via Docker
+
+1. Create a .env file in the root of the src/ folder, using .env.example as a base and replacing the values of 
+KEYBASE_AGENTAVAILABILITYBOT_USERNAME, KEYBASE_AGENTAVAILABILITYBOT_PAPERKEY, KEYBASE_AGENTAVAILABILITYBOT_TEAMNAME as appropriate. 
+2. Run the following commands in the root of the repository:
+```bash
+docker build -t "keybase-docker-local" .
+sudo docker run --env-file src/.env --rm keybase-docker-local
+```
+
+## Debugging With VSCode
+
+Add this file to your `.vscode` folder at the root of the Git repository to debug within Visual Studio Code:
+
+`launch.json` ([documentation](https://go.microsoft.com/fwlink/?linkid=830387))  
+
+```json
+{
+    "configurations": [
+        {
+            "name": "Launch Program",
+            "program": "${workspaceFolder}/src/output/src/index.js",
+            "request": "launch",
+            "smartStep": true,
+            "sourceMaps": true,
+            "type": "node"
+        }
+    ],
+    "version": "3.0.1"
+}
+```
+
+More information on Node.js debugging within VSCode can be found [here](https://code.visualstudio.com/docs/nodejs/nodejs-debugging).
+
 ## Tasks to do
+* Add build process
+* Add debugging
+* Add testing
+* Add better examples
 * Change /avail get to get all users' availability
 * Add /avail me for getting your own user's availability
 * Add permissions to limit it to to dOrg team
@@ -103,87 +166,6 @@ Examples: /avail add 0% 7/10/2020 7/30/2020
 ```
 * Deploy
 * Make proposal to dOrg DAO for bounty completion
-* Add CI/CD
-* Figure out a simple way to validate keybase usernames:
+* (Optional) Add CI/CD
+* (Optional) Figure out a simple way to validate keybase usernames:
 May need to add the [Go client](https://github.com/keybase/client) to project or implement own [user endpoint call.](https://keybase.io/docs/api/1.0/call/user/lookup)
-
-## Running locally
-
-You will need to run yarn install in the `src` folder to get started:
-
-```bash
-yarn install
-```
-
-## Debugging locally
-
-Set up these two files in a `.vscode` folder at the root of the Git repository to debug within Visual Studio Code:
-
-`launch.json` - replace example values in env's nested properties as appropriate
-
-```json
-{
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "configurations": [
-        {
-            "env": {
-                "KEYBASE_AGENTAVAILABILITYBOT_USERNAME": "keybase_username",
-                "KEYBASE_AGENTAVAILABILITYBOT_PAPERKEY": "keybase_paperkey",
-                "KEYBASE_AGENTAVAILABILITYBOT_TEAMNAME": "keybase_teamname",
-                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDPREFIX": "/avail ",
-                "KEYBASE_AGENTAVAILABILITYBOT_ASSUMEDTIME": "12:00",
-                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_ADD": "add",
-                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_GET": "get",
-                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_SET": "set",
-                "KEYBASE_AGENTAVAILABILITYBOT_COMMANDVERB_RM": "rm",
-                "KEYBASE_AGENTAVAILABILITYBOT_CONFIGKEY_DEFAULT": "default",
-                "KEYBASE_AGENTAVAILABILITYBOT_CONFIGKEY_TIMEZONE": "timezone",
-                "KEYBASE_AGENTAVAILABILITYBOT_DATEFORMAT": "M/D/YYYY",
-                "KEYBASE_AGENTAVAILABILITYBOT_INPUTDATEFORMAT": "M/D/YYYY HH:mm",
-                "KEYBASE_AGENTAVAILABILITYBOT_NAMESPACE_AVAILABILITIES": "AgentAvailability.Availabilities",
-                "KEYBASE_AGENTAVAILABILITYBOT_NAMESPACE_DEFAULT": "AgentAvailability.DefaultWorkLevels",
-                "KEYBASE_AGENTAVAILABILITYBOT_NAMESPACE_TIMEZONES": "AgentAvailability.TimeZones",
-            },
-            "name": "Launch Program",
-            "outFiles": [
-                "${workspaceFolder}/src/output/*.js"
-            ],
-            "outputCapture": "std",
-            "program": "${workspaceFolder}//src//output//index.js",
-            "request": "launch",
-            "smartStep": true,
-            "sourceMaps": true,
-            "type": "node"
-        }
-    ],
-    "version": "3.0.1"
-}
-```
-
-`tasks.json`
-
-```json
-{
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "3.0.1",
-    "tasks": [
-        {
-            "type": "typescript",
-            "tsconfig": "src\\tsconfig.json",
-            "option": "watch",
-            "problemMatcher": [
-                "$tsc-watch"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        }
-    ]
-}
-```
-
-Then run the build step by pressing `Ctrl+Shift+B`, and any updates will trigger a TypeScript build. Debug by pressing `F5`.
