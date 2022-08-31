@@ -20,7 +20,7 @@
     "dotenv": "^8.2.0",
     "keybase-bot": "^3.6.1",
     "moment": "^2.26.0",
-    "moment-timezone": "^0.5.28",
+    "moment-timezone": "^0.5.35",
     "semver": "^7.3.2"
   },
   "devDependencies": {
