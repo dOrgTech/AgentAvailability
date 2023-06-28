@@ -21,7 +21,7 @@
     "keybase-bot": "^3.6.1",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.28",
-    "semver": "^7.3.2"
+    "semver": "^7.5.2"
   },
   "devDependencies": {
     "typescript": "^3.9.2"
